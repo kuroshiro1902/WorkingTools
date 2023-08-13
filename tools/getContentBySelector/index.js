@@ -140,8 +140,8 @@ function Tool() {
         <ClearFloat style={{ marginBottom: 8 }}>
           <label>
             <small style={{ color: 'var(--blue)' }}>
-              Thuộc tính tìm kiếm (mặc định sẽ là innerText, có thể thay đổi thành innerHTML hoặc bất kì thuộc tính nào
-              của một thẻ HTML):
+              {`Thuộc tính tìm kiếm (mặc định sẽ là innerText, có thể thay đổi thành innerHTML hoặc bất kì thuộc tính nào
+              của một thẻ HTML):`}
             </small>
             <Input
               rows={1}
