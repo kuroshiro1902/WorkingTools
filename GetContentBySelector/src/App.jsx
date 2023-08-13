@@ -1,15 +1,6 @@
-//create Root
-const toolRoot = document.createElement('aside');
-toolRoot.id = 'Tool_Jason_1902';
-toolRoot.onclick = function (e) {
-  e.stopPropagation();
-};
-document.body.append(toolRoot);
-
 //REACT
-const { useState, useEffect, useMemo, useCallback, forwardRef, useRef, memo } = React;
-const s = { background: '', yellow: '', pink: '' };
-
+import { useState, useEffect, useMemo, useCallback, forwardRef, useRef, memo } from 'react' ;
+import './App.scss'
 //Button
 const Button = forwardRef(function ({ children, styles = {}, onClick = () => {}, ...rest }, ref) {
   return (
@@ -66,11 +57,11 @@ function Item({ title = '', datas }) {
 
       <div>
         {datas.length === 0 ? (
-          <p className="content" style={{ color: 'crimson' }} title="No content matches selectors">
+          <p className="_content" style={{ color: 'crimson' }} title="No content matches selectors">
             Null
           </p>
         ) : (
-          datas.map((_, index) => <p key={index} className="content" data-index={`${title}${dataindex++}`}></p>)
+          datas.map((_, index) => <p key={index} className="_content" data-index={`${title}${dataindex++}`}></p>)
         )}
       </div>
     </details>
@@ -99,7 +90,7 @@ function ClearFloat({ children, style }) {
 }
 
 //Tool
-function Tool() {
+export default function Tool() {
   const [type, setType] = useState('innerText');
   const [value, setValue] = useState('');
   const [message, setMessage] = useState('');
@@ -135,13 +126,13 @@ function Tool() {
       </Button>
     );
   return (
-    <div className="container">
+    <div className="Container">
       <main>
         <ClearFloat style={{ marginBottom: 8 }}>
           <label>
-            <small style={{ color: 'var(--blue)' }}>
+            <small style={{ color: 'var(--yellow)' }}>
               {`Thuộc tính tìm kiếm (mặc định sẽ là innerText, có thể thay đổi thành innerHTML hoặc bất kì thuộc tính nào
-              của một thẻ HTML):`}
+              của một thẻ HTML, hãy cẩn thận):`}
             </small>
             <Input
               rows={1}
@@ -202,4 +193,3 @@ function Tool() {
   );
 }
 //
-ReactDOM.render(<Tool />, toolRoot);
