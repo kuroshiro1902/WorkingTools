@@ -85,7 +85,7 @@ function Item({ title = '', data }) {
 const Results = memo(({ results, autoOpen }) => {
   results = results ?? {};
   return (
-    <div style={{ margin: '8px 0' }}>
+    <div style={{ margin: '8px 0', overflowY: 'auto', flex: 1 }}>
       {Object.keys(results).map((key) => (
         <Item key={key} title={key} data={results[key]} />
       ))}
@@ -150,7 +150,7 @@ function Tool() {
     );
   return (
     <div style={styles}>
-      <main style={{ padding: 16 }}>
+      <main style={{ padding: 16, maxHeight: '100%', display: 'flex', flexDirection: 'column' }}>
         <form onSubmit={handleSubmit}>
           <Input
             value={value}
@@ -163,7 +163,7 @@ function Tool() {
             <Button styles={{ backgroundColor: s.blue, color: '#fff', padding: 8, float: 'right' }}>Submit</Button>
           </ClearFloat>
         </form>
-        <h3 style={{ color: '#00a44d' }}>Result :</h3>
+        <p style={{ color: '#00a44d', fontWeight: 'bolder' }}>Result :</p>
         <Results results={results} />
       </main>
       <div style={{ clear: 'both' }}>
@@ -182,7 +182,7 @@ function Tool() {
 //
 const toolRoot = document.createElement('aside');
 toolRoot.id = 'toolRoot';
-toolRoot.style = 'position: fixed; bottom: 0; right: 0; color: #fff; font-family: Arial, san-serif;';
+toolRoot.style = 'position: fixed; bottom: 0; right: 0; z-index:999999; color: #fff; font-family: Arial, san-serif;';
 toolRoot.onclick = function (e) {
   e.stopPropagation();
 };
