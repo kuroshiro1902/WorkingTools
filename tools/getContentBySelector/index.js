@@ -1,5 +1,5 @@
 const type = 'innerHTML';
-// const { useState, useMemo, useCallback, memo } = React;
+const { useState, useMemo, useCallback, memo } = React;
 const s = { background: '#122335', yellow: '#f9ae01', pink: '#ff0185', blue: '#006bfc' };
 
 //Button
