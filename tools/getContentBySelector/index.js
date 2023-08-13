@@ -1,37 +1,26 @@
-const type = 'innerHTML';
-const { useState, useMemo, useCallback, memo } = React;
-const s = { background: '#122335', yellow: '#f9ae01', pink: '#ff0185', blue: '#006bfc' };
+//create Root
+const toolRoot = document.createElement('aside');
+toolRoot.id = 'Tool_Jason_1902';
+toolRoot.onclick = function (e) {
+  e.stopPropagation();
+};
+document.body.append(toolRoot);
+
+//REACT
+const { useState, useEffect, useMemo, useCallback, forwardRef, useRef, memo } = React;
+const s = { background: '', yellow: '', pink: '' };
 
 //Button
-function Button({ children, styles = {}, onClick = () => {}, ...rest }) {
-  const style = {
-    outline: 'none',
-    padding: '.4rem .2rem',
-    cursor: 'pointer',
-    borderRadius: 4,
-    ...styles,
-  };
+const Button = forwardRef(function ({ children, styles = {}, onClick = () => {}, ...rest }, ref) {
   return (
-    <button style={style} {...rest} onClick={onClick}>
+    <button ref={ref} style={styles} {...rest} onClick={onClick}>
       {children}
     </button>
   );
-}
-
+});
+Button.displayName = 'Button';
 //Input
-function Input({ value = '', styles = {}, onChange = () => {}, placeholder = '' }) {
-  const style = useMemo(() => {
-    return {
-      width: '100%',
-      fontFamily: '"Lucida Console", "Courier New", monospace',
-      fontSize: 13,
-      padding: 4,
-      tabSize: 4,
-      outline: 'none',
-      resize: 'none',
-      ...styles,
-    };
-  }, []);
+function Input({ value = '', styles = {}, onChange = () => {}, onKeyDown = () => {}, placeholder = '', ...rest }) {
   const handleTab = useCallback((e) => {
     if (e.key == 'Tab') {
       e.preventDefault();
@@ -46,129 +35,162 @@ function Input({ value = '', styles = {}, onChange = () => {}, placeholder = '' 
   }, []);
   return (
     <textarea
+      id="input"
       value={value}
       onChange={onChange}
-      onKeyDown={handleTab}
-      rows={10}
-      style={style}
+      onKeyDown={(e) => {
+        handleTab(e);
+        onKeyDown(e);
+      }}
+      rows={8}
+      style={styles}
       placeholder={placeholder}
       spellCheck={false}
+      {...rest}
     />
   );
 }
 
 //
-function Item({ title = '', data }) {
-  data = Array.from(data);
-  const titleStyle = {
-    cursor: 'pointer',
-  };
-  const contentStyles = {
-    paddingLeft: 20,
-    marginBottom: 4,
-    color: '#fe1f87',
-  };
+function Item({ title = '', datas }) {
+  let dataindex = 0;
+  useEffect(() => {
+    //đoạn này rất hay nhưng rối não, đọc lại không hiểu đâu :v
+    datas.map((_, index) => {
+      const e = (document.querySelector(`[data-index="${title}${index}"]`).innerHTML = datas[index]);
+    });
+  }, [datas]);
   return (
     <details open>
-      <summary style={titleStyle}>{title}</summary>
+      <summary style={{ cursor: 'pointer', color: datas.length === 0 ? 'crimson' : null }}>{title}</summary>
+
       <div>
-        {data.map((dom, index) => (
-          <p key={index} style={contentStyles}>
-            {dom[type]}
+        {datas.length === 0 ? (
+          <p className="content" style={{ color: 'crimson' }} title="No content matches selectors">
+            Null
           </p>
-        ))}
+        ) : (
+          datas.map((_, index) => <p key={index} className="content" data-index={`${title}${dataindex++}`}></p>)
+        )}
       </div>
     </details>
   );
 }
 //
-const Results = memo(({ results, autoOpen }) => {
+const Results = memo(({ results }) => {
   results = results ?? {};
   return (
-    <div style={{ margin: '8px 0', overflowY: 'auto', flex: 1 }}>
+    <div>
       {Object.keys(results).map((key) => (
-        <Item key={key} title={key} data={results[key]} />
+        <Item key={key} title={key} datas={results[key]} />
       ))}
     </div>
   );
 });
 Results.displayName = 'Results';
 //
-function ClearFloat({ children }) {
+function ClearFloat({ children, style }) {
   return (
     <div>
       {children}
-      <span style={{ display: 'block', clear: 'both' }} />
+      <span style={{ display: 'block', clear: 'both', ...style }} />
     </div>
   );
 }
 
 //Tool
 function Tool() {
+  const [type, setType] = useState('innerText');
   const [value, setValue] = useState('');
   const [message, setMessage] = useState('');
   const [isShow, setIsShow] = useState(true);
   const [_results, setResults] = useState(null);
   const [toggleChangeResults, setToggleChangeResults] = useState(false);
   const results = useMemo(() => _results, [toggleChangeResults]);
-  const styles = useMemo(() => {
-    return {
-      width: '30vw',
-      minWidth: 480,
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      backgroundColor: s.background,
-    };
-  }, []);
+  const submitRef = useRef();
   const handleSubmit = (e) => {
     e.preventDefault();
     try {
-      const data = JSON.parse(value);
-      let doms = {};
-      for (let key in data) {
-        doms[key] = document.querySelectorAll(data[key]);
+      const jsonObj = JSON.parse(value);
+      let data = {};
+      for (let key in jsonObj) {
+        //data = {key: HTMLProperty[]}
+        data[key] = Array.from(document.querySelectorAll(jsonObj[key])).map((element) => element[type]);
       }
-      setResults(doms);
+      setResults(data);
       setToggleChangeResults((prev) => !prev);
     } catch (error) {
-      console.log(error.message);
       setMessage(error.message);
     }
   };
   if (!isShow)
     return (
       <Button
+        className="toggle"
         onClick={() => {
           setIsShow(true);
         }}
-        styles={{ backgroundColor: s.yellow, margin: 4, color: '#000', width: 48 }}
       >
         Show
       </Button>
     );
   return (
-    <div style={styles}>
-      <main style={{ padding: 16, maxHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="container">
+      <main>
+        <ClearFloat style={{ marginBottom: 8 }}>
+          <label>
+            <small style={{ color: 'var(--blue)' }}>
+              Thuộc tính tìm kiếm (mặc định sẽ là innerText, có thể thay đổi thành innerHTML hoặc bất kì thuộc tính nào
+              của một thẻ HTML):
+            </small>
+            <Input
+              rows={1}
+              value={type}
+              styles={{ color: 'var(--pink)' }}
+              onChange={(e) => {
+                setType(e.target.value);
+              }}
+            />
+          </label>
+        </ClearFloat>
         <form onSubmit={handleSubmit}>
-          <Input
-            value={value}
-            placeholder={`Valid json object, e.g:\n\n{\n\t"title":"Welcome"\n}`}
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-          />
+          <label>
+            <small style={{ color: 'var(--green)' }}>Chuỗi json</small>
+            <Input
+              value={value}
+              placeholder={`JSON object, e.g:\n\n{\n\t"title":"Welcome"\n}`}
+              onChange={(e) => {
+                setValue(e.target.value);
+                setMessage('');
+              }}
+              onKeyDown={(e) => {
+                if (e.shiftKey && e.key === 'Enter') {
+                  // Ngăn chặn hành vi mặc định của Enter trong textarea
+                  e.preventDefault();
+                  const form = e.target.form;
+                  if (form) {
+                    submitRef.current.click();
+                  }
+                }
+              }}
+            />
+          </label>
+          <small style={{ color: 'crimson' }}>{message}</small>
           <ClearFloat>
-            <Button styles={{ backgroundColor: s.blue, color: '#fff', padding: 8, float: 'right' }}>Submit</Button>
+            <Button className="submit" ref={submitRef}>
+              Submit
+            </Button>
+          </ClearFloat>
+          <ClearFloat>
+            <small style={{ color: 'var(--blue)', float: 'right' }}>{'tips >> SHIFT ENTER to submit'}</small>
           </ClearFloat>
         </form>
-        <p style={{ color: '#00a44d', fontWeight: 'bolder' }}>Result :</p>
+        <p style={{ color: '#00a44d', fontWeight: 'bolder' }}>----- Result -----</p>
         <Results results={results} />
       </main>
       <div style={{ clear: 'both' }}>
         <Button
-          styles={{ backgroundColor: s.yellow, margin: 4, float: 'right', width: 48 }}
+          className="toggle"
           onClick={() => {
             setIsShow(false);
           }}
@@ -180,11 +202,4 @@ function Tool() {
   );
 }
 //
-const toolRoot = document.createElement('aside');
-toolRoot.id = 'toolRoot';
-toolRoot.style = 'position: fixed; bottom: 0; right: 0; z-index:999999; color: #fff; font-family: Arial, san-serif;';
-toolRoot.onclick = function (e) {
-  e.stopPropagation();
-};
-document.body.append(toolRoot);
 ReactDOM.render(<Tool />, toolRoot);
