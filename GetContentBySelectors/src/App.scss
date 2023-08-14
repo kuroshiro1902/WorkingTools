@@ -1,46 +1,48 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  #Tool_Jason_1902 {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    z-index: 999999;
-    color: #fff;
-    font-family: "Comic Sans", cursive;
-    --blue: #006bfc;
-    --green: #00a44d;
-    --dark: #122335;
-    --yellow: #f9ae01;
-    --pink: #ff0185;
-  }
-  #Tool_Jason_1902 img {
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+#Tool_Jason_1902 {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 999999;
+  color: #fff;
+  font-family: 'Comic Sans', cursive;
+  --blue: #006bfc;
+  --green: #00a44d;
+  --dark: #122335;
+  --yellow: #f9ae01;
+  --pink: #ff0185;
+  img {
     height: 60px;
   }
-  #Tool_Jason_1902 button {
+  button {
     font-family: inherit;
     outline: none;
     color: inherit;
     padding: 0.4rem 0.2rem;
     cursor: pointer;
     border-radius: 4px;
+    background-color: #1e3a55;
   }
-  #Tool_Jason_1902 button.toggle {
+  button.toggle {
     color: var(--dark);
     background-color: var(--yellow);
     margin: 4px;
     float: right;
     width: 48px;
   }
-  #Tool_Jason_1902 button.submit {
-    background-color: var(--blue);
+  label{
+    display: block;
+  }
+  button.submit {
+    background-color: var(--pink);
     padding: 8px;
     float: right;
   }
-  #Tool_Jason_1902 .container {
+  .Container {
     width: 30vw;
     min-width: 480px;
     height: 100vh;
@@ -49,22 +51,23 @@
     justify-content: space-between;
     background-color: #122335;
   }
-  #Tool_Jason_1902 main {
+  main {
     padding: 16px;
     max-height: 100%;
     overflow-y: auto;
   }
-  #Tool_Jason_1902 main::-webkit-scrollbar {
+  main::-webkit-scrollbar {
     width: 8px;
   }
-  #Tool_Jason_1902 main::-webkit-scrollbar-track {
+  main::-webkit-scrollbar-track {
     background-color: #1e3a55;
   }
-  #Tool_Jason_1902 main::-webkit-scrollbar-thumb {
+  main::-webkit-scrollbar-thumb {
     background-color: var(--blue);
     border-radius: 4px;
   }
-  #Tool_Jason_1902 #input {
+  
+  .input {
     width: 100%;
     font-family: inherit;
     font-weight: bolder;
@@ -75,14 +78,15 @@
     tab-size: 16px;
     outline: none;
     resize: none;
-    color: var(--pink);
+    color: var(--dark);
   }
-  #Tool_Jason_1902 #input::placeholder {
+  .input::placeholder {
     opacity: 0.7;
   }
-  #Tool_Jason_1902 p.content {
+  p._content {
     margin-left: 20px;
     margin-bottom: 4px;
-    color: var(--pink);
-    border-bottom: 1px solid rgba(44, 88, 135, 0.5019607843);
+    color: #ff41a3;
+    border-bottom: 1px solid #2c588780;
   }
+}
