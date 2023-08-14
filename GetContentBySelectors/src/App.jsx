@@ -89,48 +89,52 @@ function ClearFloat({ children, style }) {
 }
 //Tool
 const toolCacheKey = 'toolSearchingPosition'
+const toolCacheType = 'toolSearchingType'
 const toolSearchValue = JSON.parse(localStorage.getItem(toolCacheKey)) 
+const toolTypeValue = localStorage.getItem(toolCacheType)
 const initObj = {title:' ', publish_time:' ', content:' ', author:' ', ...toolSearchValue}
-console.log(initObj);
-const initValue = `{\n\t"title":"${initObj.title}",\n\t"publish_time":"${initObj.publish_time}",\n\t"content":"${initObj.content}",\n\t"author":"${initObj.content}"\n}` //chuyển thành chuỗi string từ initObj
+const initValue = `{\n\t"title":"${initObj.title}",\n\t"publish_time":"${initObj.publish_time}",\n\t"content":"${initObj.content}",\n\t"author":"${initObj.author}"\n}` //chuyển thành chuỗi string từ initObj
 export default function Tool() {
-  const [type, setType] = useState('innerText');
+  const [type, setType] = useState(toolTypeValue??'innerText');
   const [value, setValue] = useState(initValue);
   const [message, setMessage] = useState('');
   const [isShow, setIsShow] = useState(true);
   const [_results, setResults] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [toggleChangeResults, setToggleChangeResults] = useState(false);
   const results = useMemo(() => _results, [toggleChangeResults]);
   const submitRef = useRef();
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if(value.trim().length ===0){
-      return setMessage('Không được để trống vị trí tìm kiếm')
-    }
-    if(type.trim().length ===0){
-      setType(p=>'innerText')
-    }
-    try {
-      //loại bỏ thuộc tính không có value
-      const rawJsonObj = JSON.parse(value)
-      const jsonObj = Object.keys(rawJsonObj).reduce((acc, key) => {
-        if (rawJsonObj[key].trim() !== '') {
-          acc[key] = rawJsonObj[key];
-        }
-        return acc;
-      }, {});
-      localStorage.setItem(toolCacheKey, JSON.stringify(jsonObj))
-      let data = {};
-      for (let key in jsonObj) {
-        //data = {key: HTMLProperty[]}
-        data[key] = Array.from(document.querySelectorAll(jsonObj[key])).map((element) => element[type]??'')
+  const handleSubmit = useCallback(
+    (value, type) => {
+      if(value.trim().length ===0){
+        return setMessage('Không được để trống vị trí tìm kiếm')
       }
-      setResults(data);
-      setToggleChangeResults((prev) => !prev);
-    } catch (error) {
-      setMessage(error.message);
-    }
-  };
+      if(type.trim().length ===0){
+        setType(p=>'innerText')
+      }
+      try {
+        //loại bỏ thuộc tính không có value
+        const rawJsonObj = JSON.parse(value)
+        const jsonObj = Object.keys(rawJsonObj).reduce((acc, key) => {
+          if (rawJsonObj[key].trim() !== '') {
+            acc[key] = rawJsonObj[key];
+          }
+          return acc;
+        }, {});
+        let data = {};
+        for (let key in jsonObj) {
+          //data = {key: HTMLProperty[]}
+          data[key] = Array.from(document.querySelectorAll(jsonObj[key])).map((element) => element[type]??'')
+        }
+        setIsSubmitted(true)
+        setResults(data);
+        setToggleChangeResults((prev) => !prev);
+        localStorage.setItem(toolCacheKey, JSON.stringify(jsonObj))
+        localStorage.setItem(toolCacheType,type.trim())
+      } catch (error) {
+        setMessage(error.message);
+      }
+    },[]) ;
   const handleShiftEnter = useCallback((e) => {
     if (e.shiftKey && e.key === 'Enter') {
       // Ngăn chặn hành vi mặc định của Enter trong textarea
@@ -159,7 +163,10 @@ export default function Tool() {
   return (
     <div className="Container">
       <main>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={e=>{
+          e.preventDefault();
+          handleSubmit(value,type)}}
+        >
         <ClearFloat style={{ marginBottom: 8 }}>
           <label>
             <small style={{ color: 'var(--yellow)' }}>
@@ -171,6 +178,8 @@ export default function Tool() {
               value={type}
               style={{ color: 'var(--pink)' }}
               onChange={(e) => {
+                if(e.nativeEvent.data === ' ') return;
+                setIsSubmitted(false)
                 setType(e.target.value.trim());
               }}
               spellCheck={false}
@@ -178,11 +187,12 @@ export default function Tool() {
           </label>
         </ClearFloat>
           <label>
-            <small style={{ color: 'var(--green)' }}>{'Vị trí dò tìm (JSON)'}</small>
+            <small style={{ color: 'var(--green)' }}>{'Vị trí tìm kiếm (JSON)'}</small>
             <Input
               defaultValue={value}
               placeholder={`JSON object, e.g:\n\n{\n\t"title":"Welcome"\n}`}
               onChange={(e) => {
+                setIsSubmitted(false)
                 setValue(e.target.value);
                 setMessage('');
               }}
@@ -199,7 +209,7 @@ export default function Tool() {
             <small style={{ color: 'var(--blue)', float: 'right' }}>{'tips >> SHIFT ENTER to submit'}</small>
           </ClearFloat>
         </form>
-        <p style={{ color: '#00a44d', fontWeight: 'bolder' }}>----- Result -----</p>
+        <p style={{ color: isSubmitted? '#00a44d':'var(--yellow)', fontWeight: 'bolder' }}>{`${isSubmitted? 'RESULT:':'Not submitted...' }`}</p>
         <Results results={results} />
       </main>
       <div style={{ clear: 'both', display: 'flex', justifyContent: 'space-between', alignItems:'end' }}>
