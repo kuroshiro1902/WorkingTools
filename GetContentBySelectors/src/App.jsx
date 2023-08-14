@@ -87,11 +87,15 @@ function ClearFloat({ children, style }) {
     </div>
   );
 }
-//removes Iframes
 //Tool
+const toolCacheKey = 'toolSearchingPosition'
+const toolSearchValue = JSON.parse(localStorage.getItem(toolCacheKey)) 
+const initObj = {title:' ', publish_time:' ', content:' ', author:' ', ...toolSearchValue}
+console.log(initObj);
+const initValue = `{\n\t"title":"${initObj.title}",\n\t"publish_time":"${initObj.publish_time}",\n\t"content":"${initObj.content}",\n\t"author":"${initObj.content}"\n}` //chuyển thành chuỗi string từ initObj
 export default function Tool() {
   const [type, setType] = useState('innerText');
-  const [value, setValue] = useState('{\n\t"title":" ",\n\t"publish_time":" ",\n\t"content":" ",\n\t"author":" "\n}');
+  const [value, setValue] = useState(initValue);
   const [message, setMessage] = useState('');
   const [isShow, setIsShow] = useState(true);
   const [_results, setResults] = useState(null);
@@ -115,6 +119,7 @@ export default function Tool() {
         }
         return acc;
       }, {});
+      localStorage.setItem(toolCacheKey, JSON.stringify(jsonObj))
       let data = {};
       for (let key in jsonObj) {
         //data = {key: HTMLProperty[]}
